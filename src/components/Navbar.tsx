@@ -25,7 +25,15 @@ export default function Navbar() {
           </div>
         </SignedOut>
         <SignedIn>
-          <UserButton />
+          <div className="flex items-center gap-4">
+            <Link 
+              href="/entries"
+              className="px-4 py-2 text-sm font-medium text-black hover:text-gray-700 transition-colors"
+            >
+              Entries
+            </Link>
+            <UserButton />
+          </div>
         </SignedIn>
       </div>
     </nav>
