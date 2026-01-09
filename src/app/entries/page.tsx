@@ -8,6 +8,7 @@ interface Entry {
   title: string;
   content: string;
   createdAt: string;
+  updatedAt: string;
 }
 
 type ModeType = "week" | "search";
@@ -222,19 +223,29 @@ export default function EntriesPage() {
                 ) : (
                   <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     {weekEntries.map((entry) => (
-                      <Link
-                        href={`/entries/${entry.id}`}
+                      <div
                         key={entry.id}
                         className="flex flex-col justify-between rounded-xl border-2 border-[#FFB703] bg-white p-6 shadow-sm transition-transform hover:scale-[1.02]"
                       >
-                        <div>
+                        <Link href={`/entries/${entry.id}`} className="block flex-1">
                           <h3 className="mb-2 text-xl font-bold line-clamp-2">{entry.title}</h3>
                           <p className="mb-4 line-clamp-4 text-sm text-gray-600">{entry.content}</p>
+                        </Link>
+                        <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
+                          <div className="text-xs font-medium text-gray-400">
+                            <span>Created: {new Date(entry.createdAt).toLocaleDateString()}</span>
+                            {entry.updatedAt !== entry.createdAt && (
+                              <span className="block mt-1">Updated: {new Date(entry.updatedAt).toLocaleDateString()}</span>
+                            )}
+                          </div>
+                          <Link
+                            href={`/entries/${entry.id}/edit`}
+                            className="text-sm font-bold text-[#FFB703] hover:underline"
+                          >
+                            Edit
+                          </Link>
                         </div>
-                        <div className="text-xs font-medium text-gray-400">
-                          {new Date(entry.createdAt).toLocaleDateString()}
-                        </div>
-                      </Link>
+                      </div>
                     ))}
                   </div>
                 )}
@@ -268,19 +279,29 @@ export default function EntriesPage() {
             ) : (
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {getFilteredEntries().map((entry) => (
-                  <Link
-                    href={`/entries/${entry.id}`}
+                  <div
                     key={entry.id}
                     className="flex flex-col justify-between rounded-xl border-2 border-[#FFB703] bg-white p-6 shadow-sm transition-transform hover:scale-[1.02]"
                   >
-                    <div>
+                    <Link href={`/entries/${entry.id}`} className="block flex-1">
                       <h3 className="mb-2 text-xl font-bold line-clamp-2">{entry.title}</h3>
                       <p className="mb-4 line-clamp-4 text-sm text-gray-600">{entry.content}</p>
+                    </Link>
+                    <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
+                      <div className="text-xs font-medium text-gray-400">
+                        <span>Created: {new Date(entry.createdAt).toLocaleDateString()}</span>
+                        {entry.updatedAt !== entry.createdAt && (
+                          <span className="block mt-1">Updated: {new Date(entry.updatedAt).toLocaleDateString()}</span>
+                        )}
+                      </div>
+                      <Link
+                        href={`/entries/${entry.id}/edit`}
+                        className="text-sm font-bold text-[#FFB703] hover:underline"
+                      >
+                        Edit
+                      </Link>
                     </div>
-                    <div className="text-xs font-medium text-gray-400">
-                      {new Date(entry.createdAt).toLocaleDateString()}
-                    </div>
-                  </Link>
+                  </div>
                 ))}
               </div>
             )}
