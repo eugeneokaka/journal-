@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 interface Entry {
   id: string;
@@ -32,30 +33,59 @@ export default function RecentEntries() {
   }, []);
 
   if (isLoading) {
-    return <div className="mt-12 text-gray-500">Loading your memories...</div>;
+    return (
+      <div className="mt-16 grid w-full max-w-5xl gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="h-48 animate-pulse rounded-2xl bg-muted" />
+        ))}
+      </div>
+    );
   }
 
   if (entries.length === 0) {
-    return null;
+    return (
+      <div className="mt-12 text-center text-muted-foreground">
+        <p>No entries yet. Start writing your story.</p>
+      </div>
+    );
   }
 
   return (
-    <div className="mt-16 w-full max-w-2xl px-4">
-      <h2 className="mb-6 text-2xl font-bold text-black">Recent Entries</h2>
-      <div className="space-y-4">
+    <div className="mt-24 w-full max-w-5xl px-4">
+      <div className="flex items-center justify-between mb-8">
+        <h2 className="text-2xl font-semibold tracking-tight text-foreground">Recent Thoughts</h2>
+        <Link href="/entries" className="text-sm font-medium text-primary hover:underline">
+          View all
+        </Link>
+      </div>
+      
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {entries.map((entry) => (
-          <div
+          <Link
             key={entry.id}
-            className="rounded-xl border-2 border-[#FFB703] bg-white p-6 shadow-sm transition-transform hover:scale-[1.01]"
+            href={`/entries/${entry.id}`}
+            className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
           >
-            <div className="flex items-baseline justify-between">
-              <h3 className="text-xl font-bold text-black">{entry.title}</h3>
-              <span className="text-xs font-medium text-gray-500">
-                {new Date(entry.createdAt).toLocaleDateString()}
-              </span>
+            <div>
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-xs font-medium text-muted-foreground">
+                  {new Date(entry.createdAt).toLocaleDateString(undefined, {
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </span>
+              </div>
+              <h3 className="mt-3 text-lg font-bold leading-tight text-foreground group-hover:text-primary transition-colors">
+                {entry.title}
+              </h3>
+              <p className="mt-3 line-clamp-3 text-sm text-muted-foreground">
+                {entry.content}
+              </p>
             </div>
-            <p className="mt-2 line-clamp-3 text-gray-700">{entry.content}</p>
-          </div>
+            <div className="mt-6 flex items-center text-xs font-medium text-primary opacity-0 transition-opacity group-hover:opacity-100">
+              Read more &rarr;
+            </div>
+          </Link>
         ))}
       </div>
     </div>

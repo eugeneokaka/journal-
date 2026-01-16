@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 interface Entry {
   id: string;
@@ -12,9 +12,10 @@ interface Entry {
   updatedAt: string;
 }
 
-export default function EntryDetailPage() {
-  const params = useParams();
+export default function EntryDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
+  const { id } = use(params);
+  
   const [entry, setEntry] = useState<Entry | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -22,7 +23,7 @@ export default function EntryDetailPage() {
   useEffect(() => {
     async function fetchEntry() {
       try {
-        const res = await fetch(`/api/entries/${params.id}`);
+        const res = await fetch(`/api/entries/${id}`);
         if (!res.ok) {
           if (res.status === 404) {
             setError("Entry not found");
@@ -41,26 +42,29 @@ export default function EntryDetailPage() {
       }
     }
 
-    if (params.id) {
+    if (id) {
       fetchEntry();
     }
-  }, [params.id]);
+  }, [id]);
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-white dark:bg-white text-black">
-        <div className="text-gray-500">Loading your memory...</div>
+      <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary" />
+          <div className="text-muted-foreground animate-pulse">Retrieving memory...</div>
+        </div>
       </div>
     );
   }
 
   if (error || !entry) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-white px-4 dark:bg-white text-black">
-        <h1 className="mb-4 text-2xl font-bold text-red-500">{error || "Entry not found"}</h1>
+      <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4 text-foreground">
+        <h1 className="mb-4 text-2xl font-bold text-destructive">{error || "Entry not found"}</h1>
         <Link
           href="/entries"
-          className="text-[#FFB703] hover:underline"
+          className="text-primary hover:underline"
         >
           ← Back to entries
         </Link>
@@ -69,57 +73,57 @@ export default function EntryDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white px-4 py-8 dark:bg-white text-black">
+    <div className="min-h-screen bg-background px-4 py-12 sm:px-6">
       <div className="mx-auto max-w-3xl">
-        <Link 
-          href="/entries" 
-          className="mb-8 inline-block text-sm font-medium text-gray-500 hover:text-black transition-colors"
-        >
-          ← Back to Entries
-        </Link>
+        <div className="mb-8">
+           <Link 
+            href="/entries" 
+            className="group inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <span className="mr-2 transition-transform group-hover:-translate-x-1">←</span>
+            Back to Entries
+          </Link>
+        </div>
         
-        <article className="rounded-2xl border-2 border-[#FFB703] bg-white p-8 shadow-sm">
-          <header className="mb-8 border-b border-gray-100 pb-8">
-            <div className="flex justify-between items-start mb-4">
-              <h1 className="text-3xl font-bold sm:text-4xl">{entry.title}</h1>
+        <article className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <header className="mb-10 border-b border-border pb-8">
+            <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+              <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl lg:leading-[1.1]">
+                {entry.title}
+              </h1>
               <Link
                 href={`/entries/${entry.id}/edit`}
-                className="flex items-center gap-2 rounded-full px-4 py-2 border-2 border-[#FFB703] text-[#FFB703] hover:bg-[#FFB703] hover:text-black transition-colors font-bold text-sm"
+                className="inline-flex shrink-0 items-center justify-center rounded-full border border-input bg-background px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
               >
-                <span>Edit</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <span className="mr-2">Edit</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
                   <path d="m15 5 4 4"/>
                 </svg>
               </Link>
             </div>
-            <div className="flex flex-col gap-1 text-sm font-medium text-gray-500">
-              <time>
-                Created: {new Date(entry.createdAt).toLocaleDateString(undefined, {
+            
+            <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
+              <time className="flex items-center">
+                <svg className="mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                {new Date(entry.createdAt).toLocaleDateString(undefined, {
                   weekday: 'long', 
                   year: 'numeric', 
                   month: 'long', 
-                  day: 'numeric',
-                  hour: '2-digit', 
-                  minute: '2-digit'
+                  day: 'numeric'
                 })}
               </time>
-              {entry.updatedAt !== entry.createdAt && (
-                <time>
-                  Updated: {new Date(entry.updatedAt).toLocaleDateString(undefined, {
-                    weekday: 'long', 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric',
-                    hour: '2-digit', 
-                    minute: '2-digit'
-                  })}
-                </time>
-              )}
+              <time className="flex items-center">
+                <svg className="mr-1.5 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                {new Date(entry.createdAt).toLocaleTimeString(undefined, {
+                   hour: '2-digit',
+                   minute: '2-digit'
+                })}
+              </time>
             </div>
           </header>
           
-          <div className="prose prose-lg max-w-none text-gray-800 whitespace-pre-wrap leading-relaxed">
+          <div className="prose prose-lg prose-gray dark:prose-invert max-w-none leading-relaxed text-foreground/90 whitespace-pre-wrap">
             {entry.content}
           </div>
         </article>

@@ -73,32 +73,36 @@ export default function EditEntryPage({ params }: { params: Promise<{ id: string
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-white px-4 py-8 dark:bg-white text-black flex items-center justify-center">
+      <div className="min-h-screen bg-background px-4 py-8 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 animate-spin rounded-full border-4 border-gray-200 border-t-[#FFB703]"></div>
-          <p className="text-gray-500 font-medium">Loading your entry...</p>
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary" />
+          <p className="text-muted-foreground font-medium">Loading your entry...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white px-4 py-8 dark:bg-white text-black">
+    <div className="min-h-screen bg-background px-4 py-12 sm:px-6">
       <div className="mx-auto max-w-2xl">
         <Link
           href="/entries"
-          className="mb-6 block text-sm font-medium text-gray-500 hover:text-black"
+          className="mb-8 inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
         >
-          ← Back to Entries
+          <span className="mr-2">←</span>
+          Back to Entries
         </Link>
 
-        <h1 className="mb-8 text-3xl font-bold">Edit Entry</h1>
+        <div className="mb-8">
+          <h1 className="text-3xl font-extrabold tracking-tight">Edit Entry</h1>
+          <p className="mt-2 text-muted-foreground">Update your thoughts.</p>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
+        <form onSubmit={handleSubmit} className="space-y-8">
+          <div className="space-y-2">
             <label
               htmlFor="title"
-              className="mb-2 block text-sm font-medium text-gray-700"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
               Title
             </label>
@@ -108,15 +112,15 @@ export default function EditEntryPage({ params }: { params: Promise<{ id: string
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
-              className="w-full rounded-lg border-2 border-gray-200 px-4 py-3 outline-none transition-colors focus:border-[#FFB703]"
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               placeholder="Give your memory a title..."
             />
           </div>
 
-          <div>
+          <div className="space-y-2">
             <label
               htmlFor="content"
-              className="mb-2 block text-sm font-medium text-gray-700"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
               Content
             </label>
@@ -126,25 +130,25 @@ export default function EditEntryPage({ params }: { params: Promise<{ id: string
               onChange={(e) => setContent(e.target.value)}
               required
               rows={12}
-              className="w-full resize-none rounded-lg border-2 border-gray-200 px-4 py-3 outline-none transition-colors focus:border-[#FFB703]"
+              className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-y"
               placeholder="Write your thoughts..."
             />
           </div>
 
-          <div className="flex gap-4">
-            <button
-              type="submit"
-              disabled={isSaving}
-              className="rounded-full bg-[#FFB703] px-8 py-3 font-bold text-black transition-transform hover:scale-105 disabled:opacity-50"
-            >
-              {isSaving ? "Saving..." : "Save Changes"}
-            </button>
+          <div className="flex justify-end gap-4">
             <Link
               href="/entries"
-              className="rounded-full bg-gray-100 px-8 py-3 font-bold text-gray-600 transition-colors hover:bg-gray-200"
+              className="inline-flex h-10 items-center justify-center rounded-full border border-input bg-background px-8 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
             >
               Cancel
             </Link>
+            <button
+              type="submit"
+              disabled={isSaving}
+              className="inline-flex h-10 items-center justify-center rounded-full bg-primary px-8 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+            >
+              {isSaving ? "Saving..." : "Save Changes"}
+            </button>
           </div>
         </form>
       </div>

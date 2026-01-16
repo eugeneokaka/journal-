@@ -51,31 +51,21 @@ export default function EntriesPage() {
   const getFirstSundayOfMonth = (date: Date): Date => {
     const year = date.getFullYear();
     const month = date.getMonth();
-    
-    // Start from the 1st of the month
     const firstDay = new Date(year, month, 1);
-    
-    // Find the first Sunday
     const dayOfWeek = firstDay.getDay();
     const daysUntilSunday = dayOfWeek === 0 ? 0 : 7 - dayOfWeek;
-    
-    const firstSunday = new Date(year, month, 1 + daysUntilSunday);
-    return firstSunday;
+    return new Date(year, month, 1 + daysUntilSunday);
   };
 
   // Helper function: Generate week ranges for the current month only
   const getWeekRanges = (): WeekRange[] => {
     const now = new Date();
     const currentMonth = now.getMonth();
-    const currentYear = now.getFullYear();
     const firstSunday = getFirstSundayOfMonth(now);
     
     const ranges: WeekRange[] = [];
-    
-    // Start from the first Sunday of the month
     let currentStart = new Date(firstSunday);
     
-    // Generate ranges until we go past the current month
     while (currentStart.getMonth() === currentMonth) {
       const start = new Date(currentStart);
       const end = new Date(currentStart);
@@ -91,7 +81,7 @@ export default function EntriesPage() {
     return ranges;
   };
 
-  // Helper function: Group entries by week (only current month)
+  // Helper function: Group entries by week
   const groupEntriesByWeek = (entries: Entry[]): Map<string, Entry[]> => {
     const now = new Date();
     const currentMonth = now.getMonth();
@@ -99,7 +89,6 @@ export default function EntriesPage() {
     const weekRanges = getWeekRanges();
     const grouped = new Map<string, Entry[]>();
     
-    // Filter entries to only include current month
     const currentMonthEntries = entries.filter(entry => {
       const entryDate = new Date(entry.createdAt);
       return entryDate.getMonth() === currentMonth && entryDate.getFullYear() === currentYear;
@@ -107,8 +96,6 @@ export default function EntriesPage() {
     
     currentMonthEntries.forEach(entry => {
       const entryDate = new Date(entry.createdAt);
-      
-      // Find which week this entry belongs to
       for (const range of weekRanges) {
         const entryDayStart = new Date(entryDate.getFullYear(), entryDate.getMonth(), entryDate.getDate());
         const rangeStart = new Date(range.start.getFullYear(), range.start.getMonth(), range.start.getDate());
@@ -127,14 +114,11 @@ export default function EntriesPage() {
     return grouped;
   };
 
-  // Filter entries for search mode
   const getFilteredEntries = (): Entry[] => {
     return entries.filter(entry => {
-      // Title search
       const matchesSearch = searchQuery === "" || 
         entry.title.toLowerCase().includes(searchQuery.toLowerCase());
       
-      // Date range filter
       const entryDate = new Date(entry.createdAt);
       const matchesStartDate = !startDate || entryDate >= new Date(startDate);
       const matchesEndDate = !endDate || entryDate <= new Date(endDate + "T23:59:59");
@@ -144,170 +128,164 @@ export default function EntriesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white px-4 py-8 dark:bg-white text-black">
-      <div className="mx-auto max-w-4xl">
-        <Link href="/" className="mb-6 block text-sm font-medium text-gray-500 hover:text-black">
-          ← Back to Dashboard
-        </Link>
-        
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-6">Your Entries</h1>
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
+      <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
+        <div className="mb-10 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Your Entries</h1>
+            <p className="mt-2 text-muted-foreground">Manage and revisit your memories.</p>
+          </div>
           
-          {/* Mode Toggle */}
-          <div className="flex gap-2 rounded-full bg-gray-100 p-1 w-fit mb-6">
+          <div className="bg-muted p-1 rounded-full inline-flex">
             {(["week", "search"] as ModeType[]).map((m) => (
               <button
                 key={m}
                 onClick={() => setMode(m)}
                 className={`rounded-full px-6 py-2 text-sm font-medium transition-all ${
                   mode === m
-                    ? "bg-[#FFB703] text-black shadow-sm"
-                    : "text-gray-500 hover:text-black"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {m.charAt(0).toUpperCase() + m.slice(1)}
               </button>
             ))}
           </div>
-          
-          {/* Search Mode Controls */}
-          {mode === "search" && (
-            <div className="space-y-4 mb-6">
-              <input
-                type="text"
-                placeholder="Search by title..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-[#FFB703] focus:outline-none transition-colors"
-              />
+        </div>
+
+        {mode === "search" && (
+          <div className="mb-8 rounded-2xl border border-border bg-card p-6 shadow-sm">
+            <div className="grid gap-6 md:grid-cols-2">
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Search
+                </label>
+                <input
+                  type="text"
+                  placeholder="Search by title..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                />
+              </div>
               
-              <div className="flex gap-4 flex-wrap">
-                <div className="flex-1 min-w-[200px]">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Start Date
-                  </label>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium leading-none">Start Date</label>
                   <input
                     type="date"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="w-full px-4 py-2 rounded-lg border-2 border-gray-200 focus:border-[#FFB703] focus:outline-none transition-colors"
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   />
                 </div>
-                
-                <div className="flex-1 min-w-[200px]">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    End Date
-                  </label>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium leading-none">End Date</label>
                   <input
                     type="date"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
-                    className="w-full px-4 py-2 rounded-lg border-2 border-gray-200 focus:border-[#FFB703] focus:outline-none transition-colors"
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   />
                 </div>
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
         {isLoading ? (
-          <div className="text-center text-gray-500">Loading your memories...</div>
+           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+             {[1, 2, 3].map((i) => (
+               <div key={i} className="h-48 animate-pulse rounded-2xl bg-muted" />
+             ))}
+           </div>
         ) : mode === "week" ? (
-          // Week Mode Display
-          <div className="space-y-8">
+          <div className="space-y-12">
             {Array.from(groupEntriesByWeek(entries)).map(([weekLabel, weekEntries]) => (
               <div key={weekLabel}>
-                <h2 className="text-xl font-bold mb-4 text-gray-800">{weekLabel}</h2>
+                <h2 className="mb-6 text-xl font-semibold tracking-tight">{weekLabel}</h2>
                 {weekEntries.length === 0 ? (
-                  <p className="text-gray-400 italic ml-4">No entries this week</p>
+                  <p className="text-muted-foreground italic">No entries this week.</p>
                 ) : (
                   <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     {weekEntries.map((entry) => (
-                      <div
-                        key={entry.id}
-                        className="flex flex-col justify-between rounded-xl border-2 border-[#FFB703] bg-white p-6 shadow-sm transition-transform hover:scale-[1.02]"
-                      >
-                        <Link href={`/entries/${entry.id}`} className="block flex-1">
-                          <h3 className="mb-2 text-xl font-bold line-clamp-2">{entry.title}</h3>
-                          <p className="mb-4 line-clamp-4 text-sm text-gray-600">{entry.content}</p>
-                        </Link>
-                        <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
-                          <div className="text-xs font-medium text-gray-400">
-                            <span>Created: {new Date(entry.createdAt).toLocaleDateString()}</span>
-                            {entry.updatedAt !== entry.createdAt && (
-                              <span className="block mt-1">Updated: {new Date(entry.updatedAt).toLocaleDateString()}</span>
-                            )}
-                          </div>
-                          <Link
-                            href={`/entries/${entry.id}/edit`}
-                            className="text-sm font-bold text-[#FFB703] hover:underline"
-                          >
-                            Edit
-                          </Link>
-                        </div>
-                      </div>
+                      <EntryCard key={entry.id} entry={entry} />
                     ))}
                   </div>
                 )}
               </div>
             ))}
-            {groupEntriesByWeek(entries).size === 0 && (
-              <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 py-16 text-center">
-                <p className="mb-4 text-gray-500">No entries found.</p>
-                <Link
-                  href="/new-entry"
-                  className="font-bold text-[#FFB703] hover:underline"
-                >
-                  Write something new?
-                </Link>
-              </div>
+             {groupEntriesByWeek(entries).size === 0 && (
+              <EmptyState />
             )}
           </div>
         ) : (
-          // Search Mode Display
           <div>
             {getFilteredEntries().length === 0 ? (
-              <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 py-16 text-center">
-                <p className="mb-4 text-gray-500">No entries found matching your search.</p>
-                <Link
-                  href="/new-entry"
-                  className="font-bold text-[#FFB703] hover:underline"
-                >
-                  Write something new?
-                </Link>
-              </div>
+              <EmptyState message="No entries found matching your search." />
             ) : (
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {getFilteredEntries().map((entry) => (
-                  <div
-                    key={entry.id}
-                    className="flex flex-col justify-between rounded-xl border-2 border-[#FFB703] bg-white p-6 shadow-sm transition-transform hover:scale-[1.02]"
-                  >
-                    <Link href={`/entries/${entry.id}`} className="block flex-1">
-                      <h3 className="mb-2 text-xl font-bold line-clamp-2">{entry.title}</h3>
-                      <p className="mb-4 line-clamp-4 text-sm text-gray-600">{entry.content}</p>
-                    </Link>
-                    <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
-                      <div className="text-xs font-medium text-gray-400">
-                        <span>Created: {new Date(entry.createdAt).toLocaleDateString()}</span>
-                        {entry.updatedAt !== entry.createdAt && (
-                          <span className="block mt-1">Updated: {new Date(entry.updatedAt).toLocaleDateString()}</span>
-                        )}
-                      </div>
-                      <Link
-                        href={`/entries/${entry.id}/edit`}
-                        className="text-sm font-bold text-[#FFB703] hover:underline"
-                      >
-                        Edit
-                      </Link>
-                    </div>
-                  </div>
+                  <EntryCard key={entry.id} entry={entry} />
                 ))}
               </div>
             )}
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+function EntryCard({ entry }: { entry: Entry }) {
+  return (
+    <div className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-sm transition-all hover:shadow-md hover:-translate-y-1">
+      <Link href={`/entries/${entry.id}`} className="absolute inset-0 z-10" />
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-medium text-muted-foreground">
+             {new Date(entry.createdAt).toLocaleDateString(undefined, {
+               month: 'short',
+               day: 'numeric'
+             })}
+          </span>
+          {entry.updatedAt !== entry.createdAt && (
+            <span className="text-[10px] text-muted-foreground bg-muted px-2 py-0.5 rounded-full">Edited</span>
+          )}
+        </div>
+        <h3 className="line-clamp-2 text-lg font-bold leading-tight group-hover:text-primary transition-colors">
+          {entry.title}
+        </h3>
+        <p className="line-clamp-3 text-sm text-muted-foreground">
+          {entry.content}
+        </p>
+      </div>
+      
+      <div className="mt-6 flex items-center justify-between border-t border-border pt-4">
+         <span className="text-xs font-medium text-primary opacity-0 transition-opacity group-hover:opacity-100">
+           Read more &rarr;
+         </span>
+         <Link
+            href={`/entries/${entry.id}/edit`}
+            className="z-20 text-xs font-semibold text-muted-foreground hover:text-primary transition-colors"
+         >
+           Edit
+         </Link>
+      </div>
+    </div>
+  );
+}
+
+function EmptyState({ message = "No entries found." }: { message?: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-border py-20 text-center animate-in fade-in zoom-in-95 duration-500">
+      <p className="mb-4 text-muted-foreground">{message}</p>
+      <Link
+        href="/new-entry"
+        className="rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+      >
+        Write something new
+      </Link>
     </div>
   );
 }

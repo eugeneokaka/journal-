@@ -38,51 +38,67 @@ export default function NewEntryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white px-4 py-8 dark:bg-white text-black">
+    <div className="min-h-screen bg-background px-4 py-12 sm:px-6">
       <div className="mx-auto max-w-2xl">
-        <Link href="/" className="mb-8 block text-sm font-medium text-gray-500 hover:text-black">
-          ← Back
+        <Link 
+          href="/" 
+          className="mb-8 inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <span className="mr-2">←</span>
+          Back to Home
         </Link>
-        <h1 className="mb-8 text-3xl font-bold">New Entry</h1>
         
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+        <div className="mb-8">
+          <h1 className="text-3xl font-extrabold tracking-tight">New Entry</h1>
+          <p className="mt-2 text-muted-foreground">Capture your thoughts for today.</p>
+        </div>
+        
+        <form onSubmit={handleSubmit} className="space-y-8">
+          <div className="space-y-2">
+            <label htmlFor="title" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
               Title
             </label>
             <input
               type="text"
               id="title"
               required
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-[#FFB703] focus:outline-none focus:ring-1 focus:ring-[#FFB703]"
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               placeholder="Give your entry a title..."
             />
           </div>
 
-          <div>
-            <label htmlFor="content" className="block text-sm font-medium text-gray-700">
+          <div className="space-y-2">
+            <label htmlFor="content" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
               Content
             </label>
             <textarea
               id="content"
               required
-              rows={6}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-[#FFB703] focus:outline-none focus:ring-1 focus:ring-[#FFB703]"
+              rows={12}
+              className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-y"
               value={formData.content}
               onChange={(e) => setFormData({ ...formData, content: e.target.value })}
               placeholder="How is your day going?"
             />
           </div>
 
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full rounded-full bg-[#FFB703] py-3 text-lg font-bold text-black transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 disabled:hover:scale-100"
-          >
-            {isLoading ? "Saving..." : "Save Entry"}
-          </button>
+          <div className="flex justify-end gap-4">
+            <Link
+               href="/"
+               className="inline-flex h-10 items-center justify-center rounded-full border border-input bg-background px-8 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+            >
+              Cancel
+            </Link>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="inline-flex h-10 items-center justify-center rounded-full bg-primary px-8 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+            >
+              {isLoading ? "Saving..." : "Save Entry"}
+            </button>
+          </div>
         </form>
       </div>
     </div>
